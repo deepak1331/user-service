@@ -22,8 +22,8 @@ import java.util.List;
 @Slf4j
 public class UserService {
 
-    @Value("${department-service-url}")
-    private String DEPARTMENT_SERVICE_URL;
+//    @Value("${department-service-url}")
+//    private String DEPARTMENT_SERVICE_URL;
 
     @Autowired
     private UserRepository repository;
@@ -42,17 +42,17 @@ public class UserService {
     }
 
     public ResponseTemplateVO getUserWithDepartmentById(Long id) {
-        log.info("Inside getUserWithDepartmentById -> Fetching User With Department By Id User's Info" + id);
+        log.info("Inside getUserWithDepartmentById -> Fetching User With Department By Id: " + id);
         ResponseTemplateVO vo = new ResponseTemplateVO();
         User user = repository.findById(id).
                 orElseThrow(() -> new ResourceNotFoundException("User not found with ID:" + id));
         String deptUrl = null;
         if (user != null) {
-            deptUrl =  DEPARTMENT_SERVICE_URL + "/fetch/" + user.getDepartmentId();
-            log.info("User found: with User's Dept ID: {}, calling Department service URL :{}",
-                    user.getDepartmentId(),deptUrl);
+//            deptUrl =  "http://"+DEPARTMENT-SERVICE + "/fetch/" + user.getDepartmentId();
+            log.info("User found, with Dept ID: {}", user.getDepartmentId());
         }
-        Department department = restTemplate.getForObject(deptUrl, Department.class);
+        //since we have service-registry we can directly use DEPARTMENT-SERVICE in the url, instead of localhost:9001
+        Department department = restTemplate.getForObject("http://DEPARTMENT-SERVICE/department/fetch/" + user.getDepartmentId(), Department.class);
         vo.setUser(user);
         vo.setDepartment(department);
         return vo;
@@ -62,7 +62,7 @@ public class UserService {
         List<ResponseTemplateVO> voList = new ArrayList<>();
         List<User> userList = repository.findAll();
         userList.forEach(user -> {
-            Department department = restTemplate.getForObject(DEPARTMENT_SERVICE_URL + "/fetch/" + user.getDepartmentId(), Department.class);
+            Department department = restTemplate.getForObject("http://DEPARTMENT-SERVICE/department/fetch/" + user.getDepartmentId(), Department.class);
             voList.add(new ResponseTemplateVO(user, department));
         });
         return voList;

@@ -2,6 +2,8 @@ server:
   port: 9002
 
 spring:
+  application:
+    name: USER-SERVICE
   datasource:
     username: root
     password: p@ssw0rd
@@ -13,3 +15,12 @@ spring:
     hibernate:
       ddl-auto: update
     properties.hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    hostname: localhost
